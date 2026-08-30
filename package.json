@@ -17,8 +17,8 @@
     "fx", "exchange-rates", "africa", "parallel-market"
   ],
   "homepage": "https://agents.nibiashara.biz/docs",
-  "repository": { "type": "git", "url": "git+https://github.com/nibiashara/shelves.git" },
-  "bugs": { "url": "https://github.com/nibiashara/shelves/issues" },
+  "repository": { "type": "git", "url": "git+https://github.com/twe-cloud/nibiashara-shelves.git" },
+  "bugs": { "url": "https://github.com/twe-cloud/nibiashara-shelves/issues" },
   "author": "Ni Biashara LLC",
   "license": "MIT"
 }
