@@ -1,0 +1,24 @@
+{
+  "name": "@nibiashara/shelves",
+  "version": "1.0.0",
+  "description": "Pay-per-call APIs for AI agents: FMCSA carrier/broker checks, OFAC sanctions screening, African FX rates. x402 micropayments or a prepaid pass — no API key.",
+  "type": "module",
+  "main": "index.js",
+  "exports": { ".": "./index.js" },
+  "files": ["index.js", "README.md"],
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "x402", "ai-agents", "agent-payments", "mcp", "usdc", "base",
+    "fmcsa", "carrier-authority", "freight", "broker-authority",
+    "ofac", "sanctions-screening", "compliance", "kyc",
+    "fx", "exchange-rates", "africa", "parallel-market"
+  ],
+  "homepage": "https://agents.nibiashara.biz/docs",
+  "repository": { "type": "git", "url": "git+https://github.com/nibiashara/shelves.git" },
+  "bugs": { "url": "https://github.com/nibiashara/shelves/issues" },
+  "author": "Ni Biashara LLC",
+  "license": "MIT"
+}
