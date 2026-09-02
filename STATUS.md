@@ -5,29 +5,34 @@
 - **Lane:** BUSINESS (Ni Biashara LLC) — distribution arm of the AI Money lane
 - **Serves:** https://agents.nibiashara.biz (see `/Users/motwe/AI Money/STATUS.md`)
 
-## Current state (2026-08-30) — written, tested, NOT yet on npm
+## Current state (2026-09-01) — agent-first client, NOT yet on npm
 
-Created this session because the AI Money funnel showed the problem is demand,
-not discovery: ~4,000 402-probes a day, essentially all of them uptime and
-trust monitors rather than buyers. Listing harder in the x402 directories adds
-monitors; reaching developers who *install tools* is the durable path, and that
-audience lives on npm and GitHub.
+Demand problem, not discovery: ~4k 402 probes/day are uptime monitors; real
+agent buyers are ~$0. Agents find tools via MCP install + README/llms-style
+docs, not x402 directories. This package is the GitHub/npm surface an agent
+should install **without a human SKU menu**.
 
 **Shipped:**
-- `index.js` — `Shelves` class, zero dependencies. Two payment modes behind one
-  call surface: a prepaid `pass` (sent as `X-SHELF-PASS`) or an x402-capable
-  `fetch`. Named methods for the freight, compliance and FX shelves, plus
-  `buy(sku, params)` for anything in `/catalog`. 402s raise a typed `ShelfError`
-  carrying status, sku and body.
-- `test.js` — live smoke test against production. **8/8 passing** with a pass
-  token (free surfaces, 402 path, carrier authority, safety BASICs, broker
-  authority, sanctions HIT and CLEAR, FX, credit balance).
-- `README.md`, `LICENSE` (MIT), repo topics set for discovery.
+- `index.js` — `Shelves` class, zero dependencies. Job helpers
+  (`checkCarrierAuthority`, `screenSanctionsName`, `getFxParallel`,
+  `buyShelfPass`, …) map onto live `/shelf/:sku`. `buy()` / `buyShelf()` is
+  the `buy_shelf` fallback. 1.0 method names remain as aliases. Two payment
+  modes: prepaid `pass` (`X-SHELF-PASS`) or an x402-capable `fetch`. 402s
+  raise a typed `ShelfError`. `JOBS` exports the helper→SKU map; prices still
+  come from `catalog()`.
+- `README.md` — leads with jobs + copy-paste MCP install; documents
+  `X-SHELF-PASS` as the default repeat path ($0.99 = 110 credits, 1 credit =
+  $0.01 list, eligible data shelves ≤ $0.10); points at live `/llms.txt`,
+  `/catalog`, `/mcp`, `/docs`, `/.well-known/agent-card.json`. Notes that
+  `/.well-known/x402` is being added on the Worker and 404s today.
+- `test.js` — live smoke test against production. Free surfaces (catalog,
+  JOBS↔catalog, aliases, 402) always run; paid jobs run when `SHELF_PASS` is
+  set.
 
-**Verified against production 2026-08-30:** catalog returns 19 shelves; an
-unpaid call 402s; `sanctionsScreen("Banco Nacional de Cuba")` → HIT and
-`sanctionsScreen("Kanairo Drop Logistics LLC")` → CLEAR; credits decrement and
-read back.
+**Verified against production 2026-08-30 (paid path):** catalog returns 19
+shelves; unpaid call 402s; sanctions HIT/CLEAR; credits decrement. Live MCP
+tools remain cashier-shaped (`list_shelves` / `buy_shelf` / `get_order`) —
+job names live in this client, not the Worker.
 
 ## Blockers
 
@@ -42,5 +47,5 @@ read back.
 2. Once published, add the install line to the service's `/docs` pages and to
    the awesome-mcp-servers entry (PR punkpeye/awesome-mcp-servers#13225).
 3. Keep method coverage in step with `endpoint/src/shop/catalog.ts` — new
-   shelves are reachable via `buy()` immediately, a named method is optional
-   sugar.
+   data shelves get a job helper; `buy()` reaches everything immediately.
+4. Worker follow-ups (not this repo): job-named MCP tools; `/.well-known/x402`.

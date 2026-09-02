@@ -22,8 +22,10 @@ make the raw HTTP path harder to use or discover, it is the wrong change.
 
 - **The service is the source of truth, not this package.** Shelf ids, prices
   and params live in `endpoint/src/shop/catalog.ts`. Never hardcode a price
-  here; `catalog()` fetches the live list. Convenience methods name shelves,
-  they do not describe them.
+  here; `catalog()` fetches the live list. Convenience methods are **job
+  names** (`checkCarrierAuthority`, `screenSanctionsName`, `getFxParallel`,
+  `buyShelfPass`) that map onto live `/shelf/:sku` URLs. `buy()` / MCP
+  `buy_shelf` is the fallback. Do not lead docs with flyer/landing/consult.
 - **No dependencies.** It runs on `globalThis.fetch` and Node ≥18. An x402
   signer is the caller's to supply (`opts.fetch`), never a dependency of ours.
 - **Never bundle a pass token, wallet key, or any credential.** A pass token is
