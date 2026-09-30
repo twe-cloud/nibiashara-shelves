@@ -15,7 +15,16 @@ npm i @nibiashara/shelves
 
 ## Use a pass (simplest — no wallet needed)
 
-One `$0.99` pass carries 100 credits, good on every shelf priced ≤ $0.10.
+The `shelf-pass-100` SKU costs **$0.99** and carries **110 credits** ($1.10 of
+shelf value). Each credit covers **$0.01 of list price**, so a $0.10 carrier
+check costs 10 credits, a $0.02 sanctions screen costs 2, and a $0.25 check
+costs 25. Passes work on **data shelves priced ≤ $0.25**; they do not cover
+higher-priced data or service intake/balances. The SKU id retains its original
+name; it does not mean 100 credits or one credit per call.
+
+Prices and eligibility come from the [live catalog](https://agents.nibiashara.biz/catalog).
+Card-funded packs are separate offers; check their displayed prices/credits.
+Keep `SHELF_PASS` secret: it is a bearer credential with prepaid value.
 
 ```js
 import { Shelves } from "@nibiashara/shelves";
@@ -30,7 +39,7 @@ if (carrier.verdict !== "CLEAR") console.log("hold:", carrier.flags);
 const screen = await shelves.sanctionsScreen({ name: "Example Trading Co" });
 // screen.verdict === "CLEAR" | "REVIEW" | "HIT"
 
-console.log(await shelves.creditsRemaining()); // 98
+console.log(await shelves.creditsRemaining()); // 98 if a fresh 110-credit pass paid for both calls (10 + 2)
 ```
 
 ## Or pay per call with a wallet
@@ -63,6 +72,30 @@ const rate = await shelves.fxParallel({ pair: "USD-NGN" });
 Verdicts are deterministic rules-engine output, never an LLM guess. Sanctions
 data is refreshed daily from the U.S. Treasury OFAC list service; FMCSA data is
 fetched live per call.
+
+## Connect a remote MCP client
+
+Use the hosted **Streamable HTTP** MCP endpoint:
+`https://agents.nibiashara.biz/mcp`. In a client that supports remote MCP,
+add that URL as a remote server; no local server deployment is required.
+An illustrative client configuration (field names vary by client):
+
+```json
+{
+  "mcpServers": {
+    "shelves": {
+      "type": "http",
+      "url": "https://agents.nibiashara.biz/mcp"
+    }
+  }
+}
+```
+
+Or use [Glama's remote Shelves connector and Inspector](https://glama.ai/mcp/connectors/biz.nibiashara/shelves).
+The connector is separate from this client repository's local-deployment label.
+Discovery does not require a payment credential; paid tools still require the
+advertised payment flow or an eligible pass. A bare browser GET is not an MCP
+initialization or tool-call test. Never put a pass token in a public config.
 
 ## Also available as
 
