@@ -15,10 +15,14 @@ npm i @nibiashara/shelves
 
 ## Use a pass (simplest — no wallet needed)
 
-Read the live `/catalog` entry for `shelf-pass-100` and `/catalog-policy` before buying.
+Read the live `/catalog` entry for `shelf-pass-100` before buying; consult
+`/catalog-policy` once that route is deployed.
 The service defines the current price, credit count and eligible shelves; this
 client does not freeze a quoted price. A credit is a cent of eligible shelf value,
 so different shelves spend different numbers of credits.
+
+Card-funded packs are separate offers; check their displayed prices/credits.
+Keep `SHELF_PASS` secret: it is a bearer credential with prepaid value.
 
 ```js
 import { Shelves } from "@nibiashara/shelves";
@@ -54,7 +58,7 @@ const rate = await shelves.fxParallel({ pair: "USD-NGN" });
 | Method | Shelf |
 | --- | --- |
 | `carrierAuthority({dot\|mc})` | FMCSA authority, safety rating, operating status |
-| `carrierSafetyBasics({dot})` | FMCSA SMS BASIC percentiles + intervention flags |
+| `carrierSafetyBasics({dot})` | FMCSA SMS safety data, subject to availability and access restrictions |
 | `brokerAuthority({mc})` | FMCSA broker authority status |
 | `sanctionsScreen({name})` | OFAC SDN + Consolidated screen, ~40k names |
 | `fxOfficial({pair})` | Central-bank reference rate |
@@ -67,6 +71,30 @@ Verdicts are deterministic rules-engine output, never an LLM guess. Sanctions
 data is refreshed daily from the U.S. Treasury OFAC list service; FMCSA data is
 fetched live per call.
 
+## Connect a remote MCP client
+
+Use the hosted **Streamable HTTP** MCP endpoint:
+`https://agents.nibiashara.biz/mcp`. In a client that supports remote MCP,
+add that URL as a remote server; no local server deployment is required.
+An illustrative client configuration (field names vary by client):
+
+```json
+{
+  "mcpServers": {
+    "shelves": {
+      "type": "http",
+      "url": "https://agents.nibiashara.biz/mcp"
+    }
+  }
+}
+```
+
+Or use [Glama's remote Shelves connector and Inspector](https://glama.ai/mcp/connectors/biz.nibiashara/shelves).
+The connector is separate from this client repository's local-deployment label.
+Discovery does not require a payment credential; paid tools still require the
+advertised payment flow or an eligible pass. A bare browser GET is not an MCP
+initialization or tool-call test. Never put a pass token in a public config.
+
 ## Also available as
 
 - **MCP server** — `https://agents.nibiashara.biz/mcp` (registry id `biz.nibiashara/shelves`)
@@ -77,11 +105,16 @@ fetched live per call.
 
 Screening and authority checks are decision aids, not legal advice. Confirm
 identity (DOB, address, ID numbers) before acting on a sanctions match, and
-verify insurance and surety bonds before tendering freight.
+verify insurance and surety bonds before tendering freight. FMCSA safety-data
+availability and access restrictions apply; public percentiles are not guaranteed.
 
 MIT © Ni Biashara LLC
 
 ## Protocol, free discovery and aggregate evidence
+
+The growth helpers below are implemented in this client and server source but
+have not been deployed to production. Their availability depends on a completed
+server rollout and verified storage readiness.
 
 Native `/shelf/:sku` uses x402 v2. Older `/api/fx/*` routes retain their v1
 JSON compatibility and advertise v2 headers where available. Read
