@@ -15,7 +15,10 @@ npm i @nibiashara/shelves
 
 ## Use a pass (simplest — no wallet needed)
 
-One `$0.99` pass carries 100 credits, good on every shelf priced ≤ $0.10.
+Read the live `/catalog` entry for `shelf-pass-100` and `/catalog-policy` before buying.
+The service defines the current price, credit count and eligible shelves; this
+client does not freeze a quoted price. A credit is a cent of eligible shelf value,
+so different shelves spend different numbers of credits.
 
 ```js
 import { Shelves } from "@nibiashara/shelves";
@@ -30,7 +33,7 @@ if (carrier.verdict !== "CLEAR") console.log("hold:", carrier.flags);
 const screen = await shelves.sanctionsScreen({ name: "Example Trading Co" });
 // screen.verdict === "CLEAR" | "REVIEW" | "HIT"
 
-console.log(await shelves.creditsRemaining()); // 98
+console.log(await shelves.creditsRemaining()); // actual server balance
 ```
 
 ## Or pay per call with a wallet
@@ -48,17 +51,17 @@ const rate = await shelves.fxParallel({ pair: "USD-NGN" });
 
 ## Shelves
 
-| Method | Shelf | Price |
-| --- | --- | --- |
-| `carrierAuthority({dot\|mc})` | FMCSA authority, safety rating, operating status | $0.10 |
-| `carrierSafetyBasics({dot})` | FMCSA SMS BASIC percentiles + intervention flags | $0.10 |
-| `brokerAuthority({mc})` | FMCSA broker authority status | $0.10 |
-| `sanctionsScreen({name})` | OFAC SDN + Consolidated screen, ~40k names | $0.02 |
-| `fxOfficial({pair})` | Central-bank reference rate | $0.01 |
-| `fxOfficialAll()` | All eight African pairs | $0.02 |
-| `fxParallel({pair})` | Street rate + spread (USD-NGN, USD-GHS) | $0.05 |
-| `fxDailyBrief()` | Every official + parallel quote in one call | $0.50 |
-| `buy(sku, params)` | Any shelf by id — see `/catalog` | varies |
+| Method | Shelf |
+| --- | --- |
+| `carrierAuthority({dot\|mc})` | FMCSA authority, safety rating, operating status |
+| `carrierSafetyBasics({dot})` | FMCSA SMS BASIC percentiles + intervention flags |
+| `brokerAuthority({mc})` | FMCSA broker authority status |
+| `sanctionsScreen({name})` | OFAC SDN + Consolidated screen, ~40k names |
+| `fxOfficial({pair})` | Central-bank reference rate |
+| `fxOfficialAll()` | All eight African pairs |
+| `fxParallel({pair})` | Street rate + spread (USD-NGN, USD-GHS) |
+| `fxDailyBrief()` | Every official + parallel quote in one call |
+| `buy(sku, params)` | Any shelf by id — see `/catalog` |
 
 Verdicts are deterministic rules-engine output, never an LLM guess. Sanctions
 data is refreshed daily from the U.S. Treasury OFAC list service; FMCSA data is
@@ -77,3 +80,27 @@ identity (DOB, address, ID numbers) before acting on a sanctions match, and
 verify insurance and surety bonds before tendering freight.
 
 MIT © Ni Biashara LLC
+
+## Protocol, free discovery and aggregate evidence
+
+Native `/shelf/:sku` uses x402 v2. Older `/api/fx/*` routes retain their v1
+JSON compatibility and advertise v2 headers where available. Read
+`await shelves.catalogPolicy()` for the supported paths and current prices;
+service intake price and full service price are different fields. No future
+price increase is promised here.
+
+`await shelves.hello()` reads a tiny cached FX sample without a payment. A cache
+miss is reported honestly; it is not a new upstream quote. `freeFx()` requests
+the server's optional 10/day edge-IP quota. It can be unavailable until the
+server's storage, trusted edge identity and private quota binding are ready. A
+claimed wallet address does not grant free calls; a truncated address never
+grants repeat-wallet credits. There is no active repeat-wallet allowlist.
+
+`await shelves.stats()` returns only the deployed ledger's scoped aggregate
+evidence with a timestamp. Unavailable coverage is not zero revenue. A settled
+payment, fulfilled data call, service intake, test transaction and unclassified
+payer are different states. A wallet is not a verified person, customer or agent.
+There is no public wallet leaderboard or public receipt screenshot.
+
+Run dependency-free local checks with `node --test offline.test.js`. The existing
+`test.js` is a separate live smoke check and is not run by this offline command.

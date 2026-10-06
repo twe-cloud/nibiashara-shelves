@@ -62,8 +62,8 @@ export class Shelves {
     if (!res.ok) {
       throw new ShelfError(body?.detail ?? body?.error ?? `shelf ${sku} failed (HTTP ${res.status})`, { status: res.status, sku, body });
     }
-    if (body && typeof body === "object" && "pass_calls_remaining" in body) {
-      this.lastCreditsRemaining = body.pass_calls_remaining;
+    if (body && typeof body === "object" && "pass_credits_remaining" in body) {
+      this.lastCreditsRemaining = body.pass_credits_remaining;
     }
     // Data shelves answer { delivery }; unwrap it, but keep tickets whole so a
     // service buyer still gets claim_url / balance details.
@@ -94,7 +94,7 @@ export class Shelves {
   fxDailyBrief() { return this.buy("fx-africa-daily-brief"); }
 
   // ---- passes ------------------------------------------------------------
-  /** Buy a 100-call pass. Needs an x402-capable fetch; adopts the token. */
+  /** Buy the catalog-defined credit pass. Needs an x402-capable fetch; adopts the token. */
   async buyPass() {
     const out = await this.buy("shelf-pass-100");
     if (out?.pass_token) this.pass = out.pass_token;
@@ -107,7 +107,7 @@ export class Shelves {
     const res = await this._fetch(`${this.origin}/pass/${this.pass}`, { headers: { accept: "application/json" } });
     if (!res.ok) return null;
     const body = await res.json();
-    return body.calls_remaining ?? null;
+    return body.credits_remaining ?? null;
   }
 
   /** The full shelf list, free and unauthenticated. */
@@ -115,6 +115,23 @@ export class Shelves {
     const res = await this._fetch(`${this.origin}/catalog`, { headers: { accept: "application/json" } });
     if (!res.ok) throw new ShelfError(`catalog failed (HTTP ${res.status})`, { status: res.status });
     return res.json();
+  }
+
+  /** Cached public sample; never claims fresh upstream data or paid delivery. */
+  hello() { return this._read("/hello"); }
+  /** Availability and quota are server-owned; caller wallet headers grant nothing. */
+  freeFx() { return this._read("/free/fx"); }
+  /** Current protocol and catalog metadata; never a client hardcoded price. */
+  catalogPolicy() { return this._read("/catalog-policy"); }
+  /** Qualified aggregate only; no individual wallet leaderboard. */
+  stats() { return this._read("/stats"); }
+  async _read(path) {
+    const res = await this._fetch(`${this.origin}${path}`, { headers: { accept: "application/json" } });
+    const body = await res.json().catch(() => null);
+    if (!res.ok || !body || typeof body !== "object") {
+      throw new ShelfError(body?.detail ?? body?.error ?? `read failed (HTTP ${res.status})`, { status: res.status, body });
+    }
+    return body;
   }
 }
 
