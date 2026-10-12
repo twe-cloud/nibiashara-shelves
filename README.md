@@ -13,10 +13,24 @@ Full docs: **https://agents.nibiashara.biz/docs**
 npm i @nibiashara/shelves
 ```
 
+## Start with a free sample
+
+```js
+import { Shelves } from "@nibiashara/shelves";
+
+const shelves = new Shelves();
+console.log(await shelves.hello()); // cached USD-KES sample, no payment
+console.log(await shelves.catalogPolicy()); // current prices and protocol
+```
+
+The sample carries its source date and is not a fresh upstream quote. A cache
+miss is reported as unavailable. Freight and sanctions checks are paid shelves;
+the free FX sample does not perform those checks.
+
 ## Use a pass (simplest — no wallet needed)
 
-Read the live `/catalog` entry for `shelf-pass-100` before buying; consult
-`/catalog-policy` once that route is deployed.
+Read the live `/catalog` entry for `shelf-pass-100` and `/catalog-policy`
+before buying.
 The service defines the current price, credit count and eligible shelves; this
 client does not freeze a quoted price. A credit is a cent of eligible shelf value,
 so different shelves spend different numbers of credits.
@@ -44,13 +58,27 @@ console.log(await shelves.creditsRemaining()); // actual server balance
 
 Bring any x402-capable fetch (e.g. `@x402/fetch` + `@x402/evm`) and the client
 uses it — each call settles its own micro-payment.
+The payment client is separate from this dependency-free package. Install
+`@x402/fetch`, `@x402/core` and `@x402/evm` in the caller's application. Follow
+the [official buyer quickstart](https://docs.x402.org/getting-started/quickstart-for-buyers)
+to supply an authorized wallet signer with USDC on Base and enforce a spending
+limit before making paid calls.
 
 ```js
 import { wrapFetchWithPayment } from "@x402/fetch";
+import { x402Client } from "@x402/core/client";
+import { ExactEvmScheme } from "@x402/evm/exact/client";
 import { Shelves } from "@nibiashara/shelves";
 
-const shelves = new Shelves({ fetch: wrapFetchWithPayment(fetch, signer) });
-const rate = await shelves.fxParallel({ pair: "USD-NGN" });
+// `signer` is supplied by your existing authorized wallet integration.
+const paymentClient = new x402Client();
+paymentClient.register("eip155:8453", new ExactEvmScheme(signer));
+const shelves = new Shelves({ fetch: wrapFetchWithPayment(fetch, paymentClient) });
+// Explicit opt-in: this call pays the current catalog price in USDC on Base.
+if (process.env.SHELVES_PAID_CALL === "yes") {
+  const carrier = await shelves.carrierAuthority({ dot: "44110" });
+  console.log(carrier.verdict);
+}
 ```
 
 ## Shelves
@@ -112,9 +140,9 @@ MIT © Ni Biashara LLC
 
 ## Protocol, free discovery and aggregate evidence
 
-The growth helpers below are implemented in this client and server source but
-have not been deployed to production. Their availability depends on a completed
-server rollout and verified storage readiness.
+The free `/hello` cached sample, `/catalog-policy` and scoped `/stats` aggregate
+are deployed. The optional `/free/fx` quota is currently unavailable; inspect the
+live response before relying on free daily calls.
 
 Native `/shelf/:sku` uses x402 v2. Older `/api/fx/*` routes retain their v1
 JSON compatibility and advertise v2 headers where available. Read
