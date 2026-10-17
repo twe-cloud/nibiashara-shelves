@@ -128,6 +128,7 @@ initialization or tool-call test. Never put a pass token in a public config.
 - **MCP server** — `https://agents.nibiashara.biz/mcp` (registry id `biz.nibiashara/shelves`)
 - **Google A2A agent** — card at `/.well-known/agent-card.json`, JSON-RPC at `/a2a`
 - **OpenAPI** — `/openapi.json`, with `x-payment-info` on every route
+- **PayAPI Market** — the Africa FX official one-pair shelf is listed and settlement-verified: https://payapi.market/api/ni-biashara-africa-fx-official-one-pair
 
 ## Notes
 
