@@ -117,6 +117,13 @@ export class Shelves {
     return res.json();
   }
 
+  /** Free FX preview (/fx/sample/:sku). Official shelves are live quotes; others are illustrative. */
+  fxSample(sku = "fx-official", { pair } = {}) {
+    return this._read(`/fx/sample/${encodeURIComponent(sku)}${pair ? `?pair=${encodeURIComponent(pair)}` : ""}`);
+  }
+  /** Free compliance preview (/compliance/sample/:sku) on a fixed sample input, never yours. */
+  complianceSample(sku = "sanctions-screen") { return this._read(`/compliance/sample/${encodeURIComponent(sku)}`); }
+
   /** Cached public sample; never claims fresh upstream data or paid delivery. */
   hello() { return this._read("/hello"); }
   /** Availability and quota are server-owned; caller wallet headers grant nothing. */

@@ -13,6 +13,19 @@ Full docs: **https://agents.nibiashara.biz/docs**
 npm i @nibiashara/shelves
 ```
 
+## Try it with no install
+
+```bash
+npx @nibiashara/shelves              # free FX sample, live catalog, MCP config
+npx @nibiashara/shelves --try fx     # live official FX preview (add --pair USD-NGN)
+npx @nibiashara/shelves --try ofac   # OFAC sanctions screen preview, fixed sample input
+npx @nibiashara/shelves --try fmcsa  # FMCSA carrier authority preview, fixed sample input
+npx @nibiashara/shelves --mcp        # just the MCP client config
+```
+
+Every command is a free GET. The compliance previews run the real shelf on one
+fixed sample input, cached for up to 6 hours; they never screen your own party.
+
 ## Start with a free sample
 
 ```js
@@ -21,11 +34,13 @@ import { Shelves } from "@nibiashara/shelves";
 const shelves = new Shelves();
 console.log(await shelves.hello()); // cached USD-KES sample, no payment
 console.log(await shelves.catalogPolicy()); // current prices and protocol
+console.log(await shelves.fxSample("fx-official", { pair: "USD-NGN" })); // live official preview
+console.log(await shelves.complianceSample("sanctions-screen")); // fixed-input OFAC preview
 ```
 
 The sample carries its source date and is not a fresh upstream quote. A cache
 miss is reported as unavailable. Freight and sanctions checks are paid shelves;
-the free FX sample does not perform those checks.
+the free previews run them on fixed sample inputs only.
 
 ## Use a pass (simplest — no wallet needed)
 
