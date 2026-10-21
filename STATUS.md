@@ -5,7 +5,12 @@
 - **Lane:** BUSINESS (Ni Biashara LLC) — distribution arm of the AI Money lane
 - **Serves:** https://agents.nibiashara.biz (see `/Users/motwe/AI Money/STATUS.md`)
 
-## Current state (2026-08-30) — written, tested, NOT yet on npm
+## Current state (2026-10-20): 1.1.0 LIVE on npm, `npx @nibiashara/shelves` works
+
+- 1.1.0 published 2026-10-21 ~02:25Z from commit 0afa80c, tarball shasum c4874a47 (Mkaguzi clearance shelves-npm-1.1.0-0afa80c, Nia GO). Adds bin `shelves`: free /hello sample, live catalog, MCP config; `--try fx|ofac|fmcsa`. Clean-dir `npx -y @nibiashara/shelves` exit 0 verified.
+- Publish route: see AGENTS.md hard rules. Token expires 2026-11-10.
+
+## History (2026-08-30), superseded: the npm blocker below was cleared 2026-10-11 (1.0.1)
 
 Created this session because the AI Money funnel showed the problem is demand,
 not discovery: ~4,000 402-probes a day, essentially all of them uptime and

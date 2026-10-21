@@ -32,9 +32,7 @@ make the raw HTTP path harder to use or discover, it is the wrong change.
 - **`test.js` hits production.** It needs a real `SHELF_PASS`; mint one with
   `POST /owner/pass/mint` (owner token) rather than paying. Without a pass it
   still checks the free surfaces and the 402 path, and must keep doing so.
-- **npm publish is founder-gated.** There is no npm auth on this machine and
-  the `@nibiashara` scope needs an account/org. Do not attempt to publish, and
-  do not rename the package to dodge the scope.
+- **npm publish = release route, not founder-gated** (since 1.0.1, 2026-10-11): Mkaguzi publish clearance pinning commit + tarball shasum, Nia's nia_go, then publish the pinned tarball via `credential_guard.py run npm-shelves-publish` with `NPM_CONFIG_USERCONFIG` set to the non-secret template `AI Money/provider-state/2026-10-11-shelves-distribution/npm-publish-config.npmrc` (without it npm says ENEEDAUTH). Token expires 2026-11-10; rotate before. Never rename the package to dodge the scope.
 - Version bumps follow the service: a new shelf is a minor bump, a changed
   method signature is a major one.
 
